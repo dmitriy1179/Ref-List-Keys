@@ -25,19 +25,21 @@ class Search extends React.Component {
     }
   }
   componentDidUpdate (nextProps) {
-    if (nextProps.query !== this.props.query) {
+    if (nextProps.reset !== this.props.reset) {
+      this.setState({
+        isReset : true,
+        errors : null,
+      }); 
+      return false  
+    }
+    else if (nextProps.query !== this.props.query) {
       this.setState({
         advices : true,
-        isReset : false
+        isReset : false,
+        errors : null,
       }); 
       this.fetch()
       return false
-    }
-    else if (nextProps.reset !== this.props.reset) {
-      this.setState({
-        isReset : true,
-      }); 
-      return false  
     }
     return true
   }
@@ -76,23 +78,24 @@ class NewSearchingAdvice extends React.Component {
     value : null,
     clear : false
   }
-  inputref = React.createRef();
+  inputRef = React.createRef();
   clearInput = () => {
-      this.inputref.current.value = "";
+      this.inputRef.current.value = "";
       this.setState({
-        clear : !this.state.clear
+        clear : !this.state.clear,
+        value : null
       })
   }
   buttonOnClick = () => {
     this.setState({
-      value : this.inputref.current.value,
+      value : this.inputRef.current.value,
     })
   }
   render() {
     return (
       <div>
         <button type="button" onClick={this.clearInput}>Clear</button>
-        <input ref={this.inputref} style={{margin:"10px"}} type="text" placeholder="Enter advice"/>
+        <input ref={this.inputRef} style={{margin:"10px"}} type="text" placeholder="Enter advice"/>
         <button type="button" onClick={this.buttonOnClick}>Search advices</button>
         <Search query={this.state.value} reset={this.state.clear}/>
       </div>

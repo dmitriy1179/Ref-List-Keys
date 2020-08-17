@@ -4,10 +4,14 @@ class Search extends React.Component {
   state = {
     advices : null,
     errors : null,
-    isReset : false
+    isReset : false, 
+    isLoad : false
   }
   async fetch() {
     try {
+      this.setState({
+        isLoad : true,
+      });
       const advicesJson = await fetch(`https://api.adviceslip.com/advice/search/${this.props.query}`);
       if (!advicesJson.ok) {
         throw new Error(advicesJson.statusText)
@@ -15,12 +19,14 @@ class Search extends React.Component {
       const advicesData = await advicesJson.json();
       this.setState({
         advices : advicesData,
+        isLoad : false
       });
     }
     catch(error) {
       console.log(error)
       this.setState({
-        errors: error
+        errors: error,
+        isLoad : false
       });
     }
   }
@@ -30,18 +36,14 @@ class Search extends React.Component {
         isReset : true,
         errors : null,
       }); 
-      return false  
     }
     else if (nextProps.query !== this.props.query) {
       this.setState({
-        advices : true,
         isReset : false,
         errors : null,
       }); 
       this.fetch()
-      return false
     }
-    return true
   }
   render() {
     if (this.state.isReset) {
@@ -53,7 +55,7 @@ class Search extends React.Component {
     if (this.state.advices === null) {
       return null
     }
-    if (this.state.advices === true) {
+    if (this.state.isLoad) {
         return <div>Loading</div>;
     }
     if (this.state.advices.message) {
@@ -80,11 +82,11 @@ class NewSearchingAdvice extends React.Component {
   }
   inputRef = React.createRef();
   clearInput = () => {
-      this.inputRef.current.value = "";
-      this.setState({
-        clear : !this.state.clear,
-        value : null
-      })
+    this.inputRef.current.value = "";
+    this.setState({
+      clear : !this.state.clear,
+      value : null
+    })
   }
   buttonOnClick = () => {
     this.setState({
